@@ -1,9 +1,11 @@
 package SubsetSum;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -13,9 +15,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.jopendocument.model.OpenDocument;
-import org.jopendocument.panel.ODSViewerPanel;
-import org.jopendocument.print.DefaultDocumentPrinter;
+
 
 public class SubsetSumHandler {
      
@@ -26,8 +26,9 @@ public class SubsetSumHandler {
     private int numberOfChromosomes;
     private double mutateProbability;
     private int searchTolerance;
-   
-    private final boolean consoleDebug = false;
+    
+    private boolean foundSolution;
+    private final boolean consoleDebug = true;
     
     private SettingsGeneratedInput initializeRandom;
     private SettingsFileInput initializeFile;
@@ -37,7 +38,7 @@ public class SubsetSumHandler {
         doubleResults=new ArrayList<>();
     }
       
-    public void findSolution(){   
+    public void findSolution(Window w){   
         // the length of chromosome: number of 0s and 1s 
         // example: we have numbers 4 5 6 7 8, the chromosome 10010 means 
         // that we take into concideration first and fourth element in this example it would be 4 and 7
@@ -92,7 +93,7 @@ public class SubsetSumHandler {
                 
                 if (currentSum==0) {
                     
-                    printResultEqualToZero(ch,inputNumbers);              
+                    printResultEqualToZero(ch,inputNumbers,w);              
                     return;
                     
                 } else 
@@ -126,7 +127,7 @@ public class SubsetSumHandler {
             if (exitCount == searchTolerance) {
                 
                 // zero result isn't obtainable, print sum closest to 0
-                printResultOtherThatZero(minimumPopulation,minResult,minimumValues);
+                printResultOtherThatZero(minimumPopulation,minResult,minimumValues,w);
                 return;
             }
 
@@ -152,10 +153,12 @@ public class SubsetSumHandler {
             System.out.print(s);
     }
 
-    private void printResultOtherThatZero(int minimumPopulation, int minResult, ArrayList<Integer> minimumValues) {
+    private void printResultOtherThatZero(int minimumPopulation, int minResult, ArrayList<Integer> minimumValues, Window w) {        
+        foundSolution=false;
         if (consoleDebug) {
+            StringBuilder result=new StringBuilder("Couldn't find values which sum is 0. \nFound minimum in "+minimumPopulation+"th population. \nMinimum sum value is "+minResult);
             System.out.println();
-            System.out.println("Couldn't find values which sum is 0. \nFound minimum in "+minimumPopulation+"th population. \nMinimum sum value is "+minResult);
+            System.out.println("Couldn't find values which sum is 0. \nFound minimum in "+minimumPopulation+"th population. \nMinimum sum value is "+minResult + "\nChosen numbers which sum is "+minResult+": ");
             System.out.println("Chosen numbers which sum is "+minResult+": ");
                 for (int i=0;i<minimumValues.size();i++) {
                     if (minimumValues.get(i) == 1){
@@ -163,19 +166,29 @@ public class SubsetSumHandler {
                     } 
                 }
             System.out.println();
+            ResultMessage m=new ResultMessage(w,result);
+            m.start();
         }
     }
     
-    private void printResultEqualToZero(Chromosome ch,ArrayList<Integer> inputNumbers) {
+    private void printResultEqualToZero(Chromosome ch,ArrayList<Integer> inputNumbers, Window w) {
+        foundSolution=true;
+        StringBuilder result=new StringBuilder("\nChosen numbers which sum is 0:\n ");
         print("\n\nFOUND IT!!\n");
         printChromosomeWithoutDetails(ch);
         print("\nChosen numbers which sum is 0: ");
         for (int i=0;i<ch.arrayOfGens.size();i++) {
             if (ch.arrayOfGens.get(i) == 1){
                 print(inputNumbers.get(i)+ " ");
+                result.append(inputNumbers.get(i)+ " ");
+                
             } 
         }
         print("\n");
+        ResultMessage m=new ResultMessage(w,result);
+        m.start();
+        
+        
     } 
     
     
@@ -244,6 +257,9 @@ public class SubsetSumHandler {
     }
     
     public void drawPlot(){
+        if(foundSolution){
+            doubleResults.add(0.0);
+        }
         Plot  mainPanel = new Plot(doubleResults);
         mainPanel.setPreferredSize(new Dimension(800, 600));
         JFrame frame = new JFrame("Results");
@@ -258,17 +274,18 @@ public class SubsetSumHandler {
         JOptionPane.showMessageDialog(w, "Set is not loaded. \nRead set from file or generate random one.");
     }
 
-    void showDocumentation() {
-        final OpenDocument doc = new OpenDocument();
-        doc.loadFrom("test.ods");
-        final JFrame mainFrame = new JFrame("Documentation");
-        DefaultDocumentPrinter printer = new DefaultDocumentPrinter();
-        ODSViewerPanel viewerPanel = new ODSViewerPanel(doc, printer, true);
-        mainFrame.setContentPane(viewerPanel);
-        mainFrame.pack();
-        mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        mainFrame.setLocation(10, 10);
-        mainFrame.setVisible(true);
+    
+    void showDocumentation(Window w) {
+        
+    if (Desktop.isDesktopSupported()) {
+        try {
+            File myFile = new File("documentation.pdf");
+            Desktop.getDesktop().open(myFile);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(w, "Set is not loaded. \nRead set from file or generate random one.");
+        }
+    }      
     }
 }
+
 

@@ -1,14 +1,20 @@
 package SubsetSum;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 public class SubsetSum extends javax.swing.JFrame {
 
     private boolean fileFlag;
-    SubsetSumHandler helper;
+    private final SubsetSumHandler helper;
+    private boolean dataFlag;
             
     public SubsetSum() {
+        Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
         helper=new SubsetSumHandler();
         this.setLocationRelativeTo(null);
         initComponents();
+        this.setLocation((int) ((dimension.getWidth() - this.getWidth()) / 2),(int)dimension.getHeight()-300);
         System.out.println("do wykresu");
         for (Double i : helper.doubleResults)
             System.out.println(i+" ");
@@ -91,13 +97,13 @@ public class SubsetSum extends javax.swing.JFrame {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(loadGeneratedSet)
                     .add(jButton1))
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-        boolean dataFlag;
+   
     private void loadGeneratedSetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadGeneratedSetActionPerformed
         fileFlag=false;
         dataFlag=true;
@@ -113,10 +119,8 @@ public class SubsetSum extends javax.swing.JFrame {
         }
         else{
             helper.confirmSettings(fileFlag);
-            helper.findSolution();
+            helper.findSolution(this);
             helper.drawPlot();
-            System.out.println("SIZE IN: "+helper.inputNumbers.size());
-            System.out.println("SIZE DR: "+helper.doubleResults.size());
         }
         helper.inputNumbers.clear();
         
@@ -131,7 +135,7 @@ public class SubsetSum extends javax.swing.JFrame {
     }//GEN-LAST:event_loadFileButtonActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        helper.showDocumentation(); 
+        helper.showDocumentation(this); 
     }//GEN-LAST:event_jButton1ActionPerformed
    
     public static void main(String args[]) {
